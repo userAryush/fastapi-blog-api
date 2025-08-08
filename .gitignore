@@ -2,3 +2,6 @@ instruction.txt
 flow.txt
 .env
 env
+__pycache__/
+
+
