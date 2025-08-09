@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from database import engine, Base
-from routes.auth_routes import router as auth_router
-
-
+from routes import auth_routes, blog_routes
 
 app = FastAPI()
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(bind=engine)
 
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+# include routers
+app.include_router(auth_routes.router, prefix="/auth", tags=["Auth"])
+app.include_router(blog_routes.router, prefix="/posts", tags=["Post"])
+
+

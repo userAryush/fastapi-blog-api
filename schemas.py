@@ -13,3 +13,9 @@ class LoginUser(BaseModel):
     
     
     model_config = {"extra":"forbid"}
+    
+class CreateBlog(BaseModel):
+    title:str
+    content:str
+    
+    model_config = {"extra":"forbid"}
