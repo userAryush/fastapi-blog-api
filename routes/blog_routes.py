@@ -28,7 +28,7 @@ def read_blog(blog_id:int, db:Session=Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
     return {"data":blog}
 
-@router.put("/update_blog/{blog_id}",status_code=status.HTTP_202_ACCEPTED)
+@router.put("/update_blog/{blog_id}",status_code=status.HTTP_200_OK)
 def update_blog(updated_blog: CreateBlog,blog_id:int, db:Session=Depends(get_db),current_user: Users = Depends(get_current_user)):
     
     # db.query(Blog).filter(Blog.id == blog_id).update(updated_blog.dict())

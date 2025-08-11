@@ -10,7 +10,11 @@ class Users(Base):
     email = Column(String(100), unique=True, index=True)
     password = Column(String(100))
     
+    # One user can have many posts
     posts = relationship("Blog", back_populates="author")
+    # One user can have many comments
+    comments = relationship("Comments", back_populates="user")
+
     
 class Blog(Base):
     __tablename__ = 'posts'
@@ -22,3 +26,16 @@ class Blog(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     author = relationship("Users", back_populates="posts")
+    comments = relationship("Comments", back_populates="post")
+    
+class Comments(Base):
+    __tablename__ = 'comments'
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(String(1000))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    blog_id = Column(Integer, ForeignKey('posts.id'))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    user = relationship("Users", back_populates="comments")
+    post = relationship("Blog", back_populates="comments")

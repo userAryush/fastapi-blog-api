@@ -19,3 +19,13 @@ class CreateBlog(BaseModel):
     content:str
     
     model_config = {"extra":"forbid"}
+    
+class CreateComment(BaseModel):
+    content:str
+    blog_id:int
+    
+    model_config = {"extra":"forbid"}
+    
+class UpdateComment(BaseModel):
+    content: str
+    model_config = {"extra":"forbid"}
