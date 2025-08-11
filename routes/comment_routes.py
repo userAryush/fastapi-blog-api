@@ -23,7 +23,7 @@ def create_comment(blog_id: int, comment: CreateComment, db: Session = Depends(g
     db.add(new_comment)
     db.commit()
     db.refresh(new_comment)
-    return new_comment
+    return {"info":"Created comment successfully","data":new_comment}
 
 @router.get("/see-all-comments/{blog_id}/", status_code= status.HTTP_200_OK)
 def get_comments(blog_id: int, db: Session = Depends(get_db)):
@@ -47,5 +47,5 @@ def update_comment(comment_id: int, comment: UpdateComment, db: Session = Depend
     existing_comment.content = comment.content
     db.commit()
     db.refresh(existing_comment)
-    return existing_comment
+    return {"info":"updated comment successfully","data":existing_comment}
 
