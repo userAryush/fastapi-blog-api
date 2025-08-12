@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends, HTTPException,status
 from schemas import CreateBlog
 from dependencies import get_db, get_current_user
 from sqlalchemy.orm import Session
-from models import Blog,Users , Tags
+from models import Blog,Users , Tags, PostLike
 
 router = APIRouter()
 
@@ -70,3 +70,37 @@ def delete_blog(blog_id:int,db:Session=Depends(get_db),current_user: Users = Dep
     db.commit()
 
     return {"details":f"{blog_id} deleted successfully!!"}
+
+
+##                        like unlike blog logic
+
+@router.post("/like/{blog_id}")
+def like_blog(blog_id:int, db:Session=Depends(get_db),current_user: Users=Depends(get_current_user)):
+    blog = db.query(Blog).filter(Blog.id == blog_id).first()
+    if not blog:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    
+    existing_like = db.query(PostLike).filter(PostLike.post_id==blog_id, PostLike.user_id==current_user.id)
+    if existing_like:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You have already liked this blog")
+    like = PostLike(
+        post_id=blog_id,
+        user_id=current_user.id
+    )
+    db.add(like)
+    db.commit()
+    return {"details":f"{current_user.id} liked post {blog_id}!!"}
+
+@router.delete("/like/{blog_id}")
+def dislike_blog(blog_id:int, db:Session=Depends(get_db),current_user: Users=Depends(get_current_user)):
+    blog = db.query(Blog).filter(Blog.id == blog_id).first()
+    if not blog:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Blog not found")
+    
+    existing_like = db.query(PostLike).filter(PostLike.post_id==blog_id, PostLike.user_id==current_user.id)
+    if not existing_like:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You have not liked this blog")
+
+    db.delete(existing_like)
+    db.commit()
+    return {"details":f"{current_user.id} liked post {blog_id}!!"}
