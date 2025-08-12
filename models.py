@@ -15,6 +15,11 @@ class Users(Base):
     # One user can have many comments
     comments = relationship("Comments", back_populates="user")
 
+class BlogTag(Base):
+    __tablename__ = 'blog_tag'
+    id = Column(Integer, primary_key=True, index=True)
+    blog_id = Column(Integer, ForeignKey('posts.id'))
+    tag_id = Column(Integer, ForeignKey('tag.id'))
     
 class Blog(Base):
     __tablename__ = 'posts'
@@ -27,6 +32,7 @@ class Blog(Base):
     
     author = relationship("Users", back_populates="posts")
     comments = relationship("Comments", back_populates="post")
+    tags = relationship("Tags", secondary='blog_tag', back_populates="posts")
     
 class Comments(Base):
     __tablename__ = 'comments'
@@ -39,3 +45,9 @@ class Comments(Base):
     
     user = relationship("Users", back_populates="comments")
     post = relationship("Blog", back_populates="comments")
+    
+class Tags(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), index=True)
+    posts = relationship("Blog", secondary='blog_tag', back_populates="tags")
