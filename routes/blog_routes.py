@@ -2,19 +2,31 @@ from fastapi import APIRouter,Depends, HTTPException,status
 from schemas import CreateBlog
 from dependencies import get_db, get_current_user
 from sqlalchemy.orm import Session
-from models import Blog
-from models import Users
+from models import Blog,Users , Tags
 
 router = APIRouter()
 
 @router.post("/create_post", status_code=status.HTTP_201_CREATED)
 def create_blog(blog: CreateBlog, db:Session=Depends(get_db), current_user: Users = Depends(get_current_user)):
-    new_blog = Blog(**blog.dict())
-    new_blog.author_id = current_user.id
+
+    # Create blog without tag_ids
+    new_blog = Blog(
+        title=blog.title,
+        content=blog.content,
+        author_id=current_user.id
+    )
+    
+    # If tag_ids are given, fetch Tag objects
+    if blog.tag_ids:
+        tags = db.query(Tags).filter(Tags.id.in_(blog.tag_ids)).all()
+        new_blog.tags = tags  # ✅ assign Tag instances, not IDs
+
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)
-    return {"data":new_blog}
+    
+    return {"data": new_blog}
+
 
 @router.get("/read_blogs", status_code=status.HTTP_200_OK)
 def read_blogs(db:Session=Depends(get_db)):

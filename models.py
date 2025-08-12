@@ -19,7 +19,7 @@ class BlogTag(Base):
     __tablename__ = 'blog_tag'
     id = Column(Integer, primary_key=True, index=True)
     blog_id = Column(Integer, ForeignKey('posts.id'))
-    tag_id = Column(Integer, ForeignKey('tag.id'))
+    tag_id = Column(Integer, ForeignKey('tags.id'))
     
 class Blog(Base):
     __tablename__ = 'posts'
@@ -51,3 +51,4 @@ class Tags(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), index=True)
     posts = relationship("Blog", secondary='blog_tag', back_populates="tags")
+    
