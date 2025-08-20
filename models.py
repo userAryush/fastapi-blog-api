@@ -5,12 +5,15 @@ from database import Base
 class PostLike(Base):
     __tablename__ = 'post_likes'
     id = Column(Integer, primary_key=True, index=True)
-    post_id = Column(Integer, ForeignKey('posts.id'))
-    user_id = Column(Integer, ForeignKey('users.id'))
+
+    post_id = Column(Integer, ForeignKey('posts.id', ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey('users.id', ondelete="CASCADE"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    user = relationship('User', back_populates='likes', ondelete="CASCADE")
-    post = relationship('Post', back_populates='likes', ondelete="CASCADE")
+
+    user = relationship('Users', back_populates='likes', passive_deletes=True)
+    post = relationship('Blog', back_populates='likes', passive_deletes=True)
+
     
 class Users(Base):
     __tablename__ = 'users'
@@ -31,13 +34,24 @@ class BlogTag(Base):
     id = Column(Integer, primary_key=True, index=True)
     blog_id = Column(Integer, ForeignKey('posts.id'))
     tag_id = Column(Integer, ForeignKey('tags.id'))
+
+
+class BlogCategory(Base):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), unique=True, index=True)
     
+    post = relationship("Blog", back_populates="category")
+    
+    
+        
 class Blog(Base):
     __tablename__ = 'posts'
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(100), index=True)
     content = Column(String(1000))
     author_id = Column(Integer, ForeignKey('users.id'))
+    category_id = Column(Integer, ForeignKey('category.id'))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
@@ -45,6 +59,7 @@ class Blog(Base):
     comments = relationship("Comments", back_populates="post")
     tags = relationship("Tags", secondary='blog_tag', back_populates="posts")
     likes = relationship("PostLike", back_populates="post")
+    category = relationship("BlogCategory", back_populates="post")
     
 class Comments(Base):
     __tablename__ = 'comments'

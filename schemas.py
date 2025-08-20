@@ -17,6 +17,7 @@ class LoginUser(BaseModel):
 class CreateBlog(BaseModel):
     title:str
     content:str
+    category_id: int
     tag_ids: Optional[List[int]] = []
     
     
@@ -34,4 +35,8 @@ class UpdateComment(BaseModel):
     
 class CreateTag(BaseModel):
     name:str
+    model_config = {"extra":"forbid"}
+    
+class CreateCategory(BaseModel):
+    name: str
     model_config = {"extra":"forbid"}
